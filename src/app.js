@@ -1,5 +1,8 @@
 import express from 'express';
 import routes from './routes';
+// Não importa como uma const pois não vai ser preciso acessar o resultado
+// ele deve executar automaticamente assim que App for chamada
+import './database';
 
 class App {
 	constructor() {

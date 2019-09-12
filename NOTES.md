@@ -1,3 +1,9 @@
+## Docker
+
+#### Creating a container
+
+`$ docker run --name gobarber -e POSTGRES_PASSWORD=123 -p 5432:5432 -d postgres`
+
 ## Eslint e Prettier
 
 #### Fixing all .js files in the src folder
