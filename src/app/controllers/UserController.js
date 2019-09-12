@@ -1,7 +1,7 @@
 import User from '../models/User';
 
 class UserController {
-	async post(req, res) {
+	async create(req, res) {
 		const { email } = req.body;
 		const userExists = await User.findOne({
 			where: { email },
@@ -10,7 +10,7 @@ class UserController {
 		if (userExists) {
 			return res.status(400).json({
 				error: 'Duplicate email.',
-				errorMessage: `The is already a user with the email '${email}'`,
+				errorMessage: `There is already a user with email '${email}'.`,
 			});
 		}
 
