@@ -18,10 +18,6 @@ class UserController {
 		try {
 			await schema.validate(req.body);
 		} catch (error) {
-			console.log('☼☼');
-			console.log(error);
-			console.log('☼☼');
-
 			if (!error.type) {
 				return res.status(400).json({
 					error: {
@@ -63,7 +59,7 @@ class UserController {
 		const userExists = await User.findOne({
 			where: { email },
 		});
-		console.log(email);
+
 		if (userExists) {
 			return res.status(400).json({
 				error: {
@@ -84,7 +80,9 @@ class UserController {
 			email: Yup.string().email(),
 		});
 
-		await schema.validate(req.body).catch(error => {
+		try {
+			await schema.validate(req.body);
+		} catch (error) {
 			if (!error.type) {
 				return res.status(400).json({
 					error: {
@@ -94,8 +92,15 @@ class UserController {
 				});
 			}
 
-			return false;
-		});
+			if (error.type === 'typeError') {
+				return res.status(400).json({
+					error: {
+						type: 'TypeError',
+						message: `'${error.path}' field must be a ${error.params.type}.`,
+					},
+				});
+			}
+		}
 
 		let { name, email } = req.body;
 
