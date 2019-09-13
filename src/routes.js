@@ -12,5 +12,6 @@ routes.post('/sessions', SessionController.create);
 routes.use(authMiddleware);
 
 routes.put('/users', UserController.update);
+routes.put('/users/password', UserController.updatePassword);
 
 export default routes;
