@@ -22,7 +22,7 @@ class UserController {
 				return res.status(400).json({
 					error: {
 						type: 'InvalidEmailFormat',
-						message: `'email' field must be a valid email.`,
+						message: `The 'email' field must be a valid email.`,
 					},
 				});
 			}
@@ -31,7 +31,7 @@ class UserController {
 				return res.status(400).json({
 					error: {
 						type: 'RequiredField',
-						message: `'${error.path}' field is required.`,
+						message: `The '${error.path}' field is required.`,
 					},
 				});
 			}
@@ -40,7 +40,7 @@ class UserController {
 				return res.status(400).json({
 					error: {
 						type: 'MinLength',
-						message: `'password' field must be at least 6 characters.`,
+						message: `The 'password' field must be at least 6 characters.`,
 					},
 				});
 			}
@@ -49,7 +49,7 @@ class UserController {
 				return res.status(400).json({
 					error: {
 						type: 'TypeError',
-						message: `'${error.path}' field must be a ${error.params.type}.`,
+						message: `The '${error.path}' field must be a ${error.params.type}.`,
 					},
 				});
 			}
@@ -87,7 +87,7 @@ class UserController {
 				return res.status(400).json({
 					error: {
 						type: 'InvalidEmailFormat',
-						message: `'email' field must be a valid email.`,
+						message: `The 'email' field must be a valid email.`,
 					},
 				});
 			}
@@ -96,7 +96,7 @@ class UserController {
 				return res.status(400).json({
 					error: {
 						type: 'TypeError',
-						message: `'${error.path}' field must be a ${error.params.type}.`,
+						message: `The '${error.path}' field must be a ${error.params.type}.`,
 					},
 				});
 			}
@@ -143,69 +143,89 @@ class UserController {
 		// 		),
 		// });
 		const schema = Yup.object().shape({
-			confirmPassword: Yup.string().when('password', (password, field) =>
-				password ? field.required().oneOf([Yup.ref('password')]) : field
+			oldPassword: Yup.string()
+				.required()
+				.min(6),
+			confirmPassword: Yup.string().when(
+				'password',
+				(password, field) =>
+					password
+						? field.required().oneOf([Yup.ref('password')])
+						: field
+				// oneOf recebe um array de possiveis valores q pode ter
+				// ref faz referencia ao valor de outro campo
 			),
 			password: Yup.string()
 				.required()
 				.min(6),
-			oldPassword: Yup.string()
-				.required()
-				.min(6),
 		});
 
-		await schema.validate(req.body).catch(error => {
-			console.log('☼');
-			console.log(JSON.stringify(error));
-			console.log('☼');
-			// if (error.type === 'required') {
-			// 	return res.status(400).json({
-			// 		error: {
-			// 			type: 'RequiredField',
-			// 			message: `'${error.path}' field is required.`,
-			// 		},
-			// 	});
-			// }
+		try {
+			await schema.validate(req.body);
+		} catch (error) {
+			if (error.type === 'required') {
+				return res.status(400).json({
+					error: {
+						type: 'RequiredField',
+						message: `The '${error.path}' field is required.`,
+					},
+				});
+			}
 
-			// if (error.type === 'min') {
-			// 	return res.status(400).json({
-			// 		error: {
-			// 			type: 'MinLength',
-			// 			message: `'${error.path}' field must be at least 6 characters.`,
-			// 		},
-			// 	});
-			// }
+			if (error.type === 'min') {
+				return res.status(400).json({
+					error: {
+						type: 'MinLength',
+						message: `The '${error.path}' field must be at least 6 characters.`,
+					},
+				});
+			}
 
-			return false;
-		});
+			if (error.type === 'oneOf') {
+				return res.status(400).json({
+					error: {
+						type: 'ValueComparisonError',
+						message: `The 'oldPassword' field must be the same as 'password'.`,
+					},
+				});
+			}
 
-		// const { oldPassword, password } = req.body;
+			if (error.type === 'typeError') {
+				return res.status(400).json({
+					error: {
+						type: 'TypeError',
+						message: `The '${error.path}' field must be a ${error.params.type}.`,
+					},
+				});
+			}
+		}
 
-		// const user = await User.findByPk(req.userId);
+		const { oldPassword, password } = req.body;
 
-		// if (!(await user.checkPassword(oldPassword))) {
-		// 	return res.status(401).json({
-		// 		error: {
-		// 			type: 'PasswordDoesNotMatch',
-		// 			message: 'The password does not match your old password.',
-		// 		},
-		// 	});
-		// }
+		const user = await User.findByPk(req.userId);
 
-		// if (oldPassword === password) {
-		// 	return res.status(400).json({
-		// 		error: {
-		// 			type: 'SamePassword',
-		// 			message:
-		// 				'Your new password is the same as your old password.',
-		// 		},
-		// 	});
-		// }
+		if (!(await user.checkPassword(oldPassword))) {
+			return res.status(401).json({
+				error: {
+					type: 'PasswordDoesNotMatch',
+					message: `The 'oldPassword' provided does not match your old password.`,
+				},
+			});
+		}
 
-		// await user.update({ password });
+		if (oldPassword === password) {
+			return res.status(400).json({
+				error: {
+					type: 'MustBeDifferent',
+					message: `Your new password must be different from your old password.`,
+				},
+			});
+		}
+
+		await user.update({ password });
 
 		return res.json({
-			message: 'Your password has been changed.successfully',
+			message: 'Your password has been changed successfully',
 		});
 	}
 }
