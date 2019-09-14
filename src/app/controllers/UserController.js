@@ -1,6 +1,7 @@
 import * as Yup from 'yup';
 // Yup não export nada por default
 import User from '../models/User';
+import validateError from '../../constants/validationErrors';
 
 class UserController {
 	async create(req, res) {
@@ -18,41 +19,7 @@ class UserController {
 		try {
 			await schema.validate(req.body);
 		} catch (error) {
-			if (!error.type) {
-				return res.status(400).json({
-					error: {
-						type: 'InvalidEmailFormat',
-						message: `The 'email' field must be a valid email.`,
-					},
-				});
-			}
-
-			if (error.type === 'required') {
-				return res.status(400).json({
-					error: {
-						type: 'RequiredField',
-						message: `The '${error.path}' field is required.`,
-					},
-				});
-			}
-
-			if (error.type === 'min') {
-				return res.status(400).json({
-					error: {
-						type: 'MinLength',
-						message: `The 'password' field must be at least 6 characters.`,
-					},
-				});
-			}
-
-			if (error.type === 'typeError') {
-				return res.status(400).json({
-					error: {
-						type: 'TypeError',
-						message: `The '${error.path}' field must be a ${error.params.type}.`,
-					},
-				});
-			}
+			validateError(error, res);
 		}
 
 		const { email } = req.body;
@@ -83,23 +50,7 @@ class UserController {
 		try {
 			await schema.validate(req.body);
 		} catch (error) {
-			if (!error.type) {
-				return res.status(400).json({
-					error: {
-						type: 'InvalidEmailFormat',
-						message: `The 'email' field must be a valid email.`,
-					},
-				});
-			}
-
-			if (error.type === 'typeError') {
-				return res.status(400).json({
-					error: {
-						type: 'TypeError',
-						message: `The '${error.path}' field must be a ${error.params.type}.`,
-					},
-				});
-			}
+			validateError(error, res);
 		}
 
 		let { name, email } = req.body;
@@ -163,41 +114,7 @@ class UserController {
 		try {
 			await schema.validate(req.body);
 		} catch (error) {
-			if (error.type === 'required') {
-				return res.status(400).json({
-					error: {
-						type: 'RequiredField',
-						message: `The '${error.path}' field is required.`,
-					},
-				});
-			}
-
-			if (error.type === 'min') {
-				return res.status(400).json({
-					error: {
-						type: 'MinLength',
-						message: `The '${error.path}' field must be at least 6 characters.`,
-					},
-				});
-			}
-
-			if (error.type === 'oneOf') {
-				return res.status(400).json({
-					error: {
-						type: 'ValueComparisonError',
-						message: `The 'oldPassword' field must be the same as 'password'.`,
-					},
-				});
-			}
-
-			if (error.type === 'typeError') {
-				return res.status(400).json({
-					error: {
-						type: 'TypeError',
-						message: `The '${error.path}' field must be a ${error.params.type}.`,
-					},
-				});
-			}
+			validateError(error, res);
 		}
 
 		const { oldPassword, password } = req.body;
