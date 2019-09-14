@@ -1,9 +1,48 @@
 import jwt from 'jsonwebtoken';
+import * as Yup from 'yup';
 import User from '../models/User';
 import authConfig from '../../config/auth';
 
 class SessionController {
 	async create(req, res) {
+		const schema = Yup.object().shape({
+			email: Yup.string()
+				.email()
+				.required(),
+			password: Yup.string().required(),
+		});
+
+		try {
+			await schema.validate(req.body);
+		} catch (error) {
+			if (!error.type) {
+				return res.status(400).json({
+					error: {
+						type: 'InvalidEmailFormat',
+						message: `The 'email' field must be a valid email.`,
+					},
+				});
+			}
+
+			if (error.type === 'required') {
+				return res.status(400).json({
+					error: {
+						type: 'RequiredField',
+						message: `The '${error.path}' field is required.`,
+					},
+				});
+			}
+
+			if (error.type === 'typeError') {
+				return res.status(400).json({
+					error: {
+						type: 'TypeError',
+						message: `The '${error.path}' field must be a ${error.params.type}.`,
+					},
+				});
+			}
+		}
+
 		const { email, password } = req.body;
 
 		const user = await User.findOne({
