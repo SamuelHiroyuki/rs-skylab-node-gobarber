@@ -49,6 +49,7 @@ export default (error, res) => {
 			type: 'UndocumentedError',
 			message:
 				"This error has not been documented. Contat us or open an Issue at 'https://github.com/SamuelHiroyuki/rs-skylab-node-gobarber'.",
+			causedBy: error,
 		},
 	});
 };

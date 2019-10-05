@@ -26,7 +26,7 @@ class SessionController {
 		});
 
 		if (!user) {
-			return res.status(401).json({
+			return res.status(400).json({
 				error: {
 					type: 'UserNotFound',
 					message: `There is no user with the email '${email}'.`,
@@ -35,7 +35,7 @@ class SessionController {
 		}
 
 		if (!(await user.checkPassword(password))) {
-			return res.status(401).json({
+			return res.status(400).json({
 				error: {
 					type: 'IncorrectPassword',
 					message: `Incorrect password for user with email '${email}'.`,
