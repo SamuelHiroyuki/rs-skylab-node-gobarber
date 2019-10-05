@@ -7,6 +7,16 @@ import validateError from '../../constants/validationErrors';
 
 class AppointmentController {
 	async index(req, res) {
+		let { page, perPage } = req.query;
+
+		if (Number.isNaN(Number(page)) || Number(page) === 0) {
+			page = 1;
+		}
+
+		if (Number.isNaN(Number(perPage)) || Number(perPage) === 0) {
+			perPage = 10;
+		}
+
 		const appointments = await Appointment.findAll({
 			where: {
 				user_id: req.userId,
@@ -14,6 +24,8 @@ class AppointmentController {
 			},
 			attributes: ['id', 'date', 'created_at'],
 			order: ['date'],
+			limit: perPage,
+			offset: (page - 1) * perPage,
 			include: [
 				{
 					model: User,
