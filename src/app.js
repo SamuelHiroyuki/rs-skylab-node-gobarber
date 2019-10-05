@@ -1,4 +1,5 @@
 import express from 'express';
+import path from 'path';
 import routes from './routes';
 // Não importa como uma const pois não vai ser preciso acessar o resultado
 // ele deve executar automaticamente assim que App for chamada
@@ -14,6 +15,10 @@ class App {
 
 	middlewares() {
 		this.server.use(express.json());
+		this.server.use(
+			'/files',
+			express.static(path.resolve(__dirname, '..', 'tmp', 'uploads'))
+		);
 	}
 
 	routes() {
