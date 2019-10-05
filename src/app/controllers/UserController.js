@@ -1,7 +1,8 @@
-import * as Yup from 'yup';
 // Yup não export nada por default
+import * as Yup from 'yup';
+
 import User from '../models/User';
-import validateError from '../../constants/validationErrors';
+import validateError from '../../validations/yupErrors';
 
 class UserController {
 	async create(req, res) {

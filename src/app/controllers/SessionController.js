@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken';
 import * as Yup from 'yup';
+
 import User from '../models/User';
 import authConfig from '../../config/auth';
-import validateError from '../../constants/validationErrors';
+import validateError from '../../validations/yupErrors';
 
 class SessionController {
 	async create(req, res) {

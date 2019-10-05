@@ -1,9 +1,10 @@
 import * as Yup from 'yup';
 import { startOfHour, parseISO, isBefore } from 'date-fns';
+
 import Appointment from '../models/Appointment';
 import User from '../models/User';
 import File from '../models/File';
-import validateError from '../../constants/validationErrors';
+import validateError from '../../validations/yupErrors';
 import pagination from '../../constants/pagination';
 
 class AppointmentController {
