@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { startOfHour, parseISO, isBefore } from 'date-fns';
+import { startOfHour, parseISO, isBefore, format } from 'date-fns';
 
 import Appointment from '../models/Appointment';
 import User from '../models/User';
@@ -88,7 +88,7 @@ class AppointmentController {
 			where: {
 				provider_id,
 				canceled_at: null,
-				date: appointmentDate,
+				date,
 			},
 		});
 
@@ -104,7 +104,7 @@ class AppointmentController {
 		const appointment = await Appointment.create({
 			user_id: req.userId,
 			provider_id,
-			date: appointmentDate,
+			date,
 		});
 
 		return res.json(appointment);
