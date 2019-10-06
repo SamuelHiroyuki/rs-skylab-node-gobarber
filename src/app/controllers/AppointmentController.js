@@ -15,6 +15,8 @@ import User from '../models/User';
 import File from '../models/File';
 import Notification from '../schemas/Notification';
 
+import Mail from '../../lib/Mail';
+
 import validateError from '../../validations/yupErrors';
 import Pagination from '../../constants/Pagination';
 
@@ -158,6 +160,18 @@ class AppointmentController {
 				id: req.params.id,
 				user_id: req.userId,
 			},
+			include: [
+				{
+					model: User,
+					as: 'provider',
+					attributes: ['name', 'email'],
+				},
+				{
+					model: User,
+					as: 'client',
+					attributes: ['name', 'email'],
+				},
+			],
 		});
 
 		if (!appointment) {
@@ -193,6 +207,12 @@ class AppointmentController {
 		appointment.canceled_at = new Date();
 
 		await appointment.save();
+
+		await Mail.sendMail({
+			to: `${appointment.provider.name} <${appointment.provider.email}>`,
+			subject: 'Schedule canceled',
+			text: `The user '${appointment.client.name}' has canceled an appointment.`,
+		});
 
 		return res.json(appointment);
 	}
