@@ -1,9 +1,12 @@
 import User from '../models/User';
 import File from '../models/File';
+import pagination from '../../constants/pagination';
 
 class ProviderController {
 	async index(req, res) {
-		const providers = await User.findAll({
+		const { limit, page, offset } = pagination(req.query);
+
+		const providers = await User.findAndCountAll({
 			where: { provider: true },
 			// attributes: ['id', 'name', 'email', 'createdAt', 'avatar_id'],
 			attributes: {
@@ -16,8 +19,16 @@ class ProviderController {
 					attributes: ['path', 'url'],
 				},
 			],
+			limit,
+			offset,
 		});
-		return res.json(providers);
+
+		return res.json({
+			page,
+			perPage: limit,
+			total: providers.count,
+			rows: providers.rows,
+		});
 	}
 }
 

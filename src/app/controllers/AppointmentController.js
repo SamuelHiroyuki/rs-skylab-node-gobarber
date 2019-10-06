@@ -36,14 +36,12 @@ class AppointmentController {
 			],
 		});
 
-		const response = {
+		return res.json({
 			page,
 			perPage: limit,
 			total: appointments.count,
 			rows: appointments.rows,
-		};
-
-		return res.json(response);
+		});
 	}
 
 	async store(req, res) {
