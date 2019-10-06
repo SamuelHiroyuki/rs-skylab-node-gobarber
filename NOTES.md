@@ -1,8 +1,12 @@
 ## Docker
 
-#### Creating a container
+#### Creating a Postgres container
 
 `$ docker run --name gobarber -e POSTGRES_PASSWORD=123 -p 5432:5432 -d postgres`
+
+#### Creating a MongoDB container
+
+`$ docker run --name mongobarber -p 27017:27017 -d -t mongo`
 
 ## Eslint e Prettier
 
