@@ -5,11 +5,11 @@ import Appointment from '../models/Appointment';
 import User from '../models/User';
 import File from '../models/File';
 import validateError from '../../validations/yupErrors';
-import pagination from '../../constants/pagination';
+import Pagination from '../../constants/Pagination';
 
 class AppointmentController {
 	async index(req, res) {
-		const { limit, page, offset } = pagination(req.query);
+		const { limit, offset, response } = Pagination(req.query);
 
 		const appointments = await Appointment.findAndCountAll({
 			where: {
@@ -36,12 +36,7 @@ class AppointmentController {
 			],
 		});
 
-		return res.json({
-			page,
-			perPage: limit,
-			total: appointments.count,
-			rows: appointments.rows,
-		});
+		return res.json(response(appointments));
 	}
 
 	async store(req, res) {
