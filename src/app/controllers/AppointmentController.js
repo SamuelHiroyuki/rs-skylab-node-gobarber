@@ -1,9 +1,13 @@
 import * as Yup from 'yup';
-import { startOfHour, parseISO, isBefore, format } from 'date-fns';
+import { startOfHour, parseISO, isBefore, format, isValid } from 'date-fns';
+// Localização pra pt_BR
+// import pt from 'date-fns/locale'
 
 import Appointment from '../models/Appointment';
 import User from '../models/User';
 import File from '../models/File';
+import Notification from '../schemas/Notification';
+
 import validateError from '../../validations/yupErrors';
 import Pagination from '../../constants/Pagination';
 
@@ -75,6 +79,15 @@ class AppointmentController {
 
 		const appointmentDate = startOfHour(parseISO(date));
 
+		if (!isValid(appointmentDate)) {
+			return res.status(400).json({
+				error: {
+					type: 'InvalidDate',
+					message: `The date ${date} is not valid.`,
+				},
+			});
+		}
+
 		if (isBefore(appointmentDate, new Date())) {
 			return res.status(400).json({
 				error: {
@@ -105,6 +118,19 @@ class AppointmentController {
 			user_id: req.userId,
 			provider_id,
 			date,
+		});
+
+		// Notify appointment provider
+		const user = await User.findByPk(req.userId);
+		const formattedDate = format(
+			appointmentDate,
+			"MMMM do 'at' p"
+			// { locale: pt, } => aplica a localização
+		);
+
+		await Notification.create({
+			content: `New appointment: user ${user.name} has scheduled a time for ${formattedDate}`,
+			user: provider_id,
 		});
 
 		return res.json(appointment);
