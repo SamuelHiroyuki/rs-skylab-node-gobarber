@@ -129,7 +129,7 @@ class AppointmentController {
 		);
 
 		await Notification.create({
-			content: `New appointment: user ${user.name} has scheduled a time for ${formattedDate}`,
+			content: `New appointment: ${user.name} has scheduled a time for ${formattedDate}`,
 			user: provider_id,
 		});
 
