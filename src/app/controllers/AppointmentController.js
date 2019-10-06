@@ -77,6 +77,15 @@ class AppointmentController {
 			});
 		}
 
+		if (provider_id === req.userId) {
+			return res.status(400).json({
+				error: {
+					type: 'InvalidProvider',
+					message: 'You cannot create an appointment with yourself.',
+				},
+			});
+		}
+
 		const appointmentDate = startOfHour(parseISO(date));
 
 		if (!isValid(appointmentDate)) {
