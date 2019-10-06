@@ -3,12 +3,13 @@ export default ({ page, perPage: limit }) => {
 		page = 1;
 	}
 
-	if (Number.isNaN(Number(limit)) || Number(limit) === 0) {
+	if (Number.isNaN(Number(limit))) {
 		limit = 10;
 	}
 
 	return {
-		limit,
-		offset: (page - 1) * limit,
+		limit: parseInt(limit, 10),
+		page: parseInt(page, 10),
+		offset: parseInt((page - 1) * limit, 10),
 	};
 };

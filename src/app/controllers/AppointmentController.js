@@ -9,14 +9,17 @@ import pagination from '../../constants/pagination';
 
 class AppointmentController {
 	async index(req, res) {
-		const appointments = await Appointment.findAll({
+		const { limit, page, offset } = pagination(req.query);
+
+		const appointments = await Appointment.findAndCountAll({
 			where: {
 				user_id: req.userId,
 				canceled_at: null,
 			},
 			attributes: ['id', 'date', 'created_at'],
 			order: ['date'],
-			...pagination(req.query),
+			limit,
+			offset,
 			include: [
 				{
 					model: User,
@@ -33,7 +36,14 @@ class AppointmentController {
 			],
 		});
 
-		return res.json(appointments);
+		const response = {
+			page,
+			perPage: limit,
+			total: appointments.count,
+			rows: appointments.rows,
+		};
+
+		return res.json(response);
 	}
 
 	async store(req, res) {
