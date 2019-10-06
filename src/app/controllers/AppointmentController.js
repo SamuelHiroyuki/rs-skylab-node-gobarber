@@ -1,5 +1,12 @@
 import * as Yup from 'yup';
-import { startOfHour, parseISO, isBefore, format, isValid } from 'date-fns';
+import {
+	startOfHour,
+	parseISO,
+	isBefore,
+	format,
+	isValid,
+	subHours,
+} from 'date-fns';
 // Localização pra pt_BR
 // import pt from 'date-fns/locale'
 
@@ -141,6 +148,51 @@ class AppointmentController {
 			content: `New appointment: ${user.name} has scheduled a time for ${formattedDate}`,
 			user: provider_id,
 		});
+
+		return res.json(appointment);
+	}
+
+	async delete(req, res) {
+		const appointment = await Appointment.findOne({
+			where: {
+				id: req.params.id,
+				user_id: req.userId,
+			},
+		});
+
+		if (!appointment) {
+			return res.status(400).json({
+				error: {
+					type: 'AppointmentNotFound',
+					message: `You have no appointment with ID '${req.params.id}'.`,
+				},
+			});
+		}
+
+		if (appointment.canceled_at) {
+			return res.status(400).json({
+				error: {
+					type: 'AppointmentCanceled',
+					message: `This appointment was already canceled on '${appointment.canceled_at}'.`,
+				},
+			});
+		}
+
+		const dateWithSub = subHours(appointment.date, 2);
+
+		if (isBefore(dateWithSub, new Date())) {
+			return res.status(400).json({
+				error: {
+					type: 'DeadlineToCancel',
+					message:
+						'You can only cancel an appointment no later than two hours before the scheduled date.',
+				},
+			});
+		}
+
+		appointment.canceled_at = new Date();
+
+		await appointment.save();
 
 		return res.json(appointment);
 	}
