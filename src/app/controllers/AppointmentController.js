@@ -187,7 +187,10 @@ class AppointmentController {
 			return res.status(400).json({
 				error: {
 					type: 'AppointmentCanceled',
-					message: `This appointment was already canceled on '${appointment.canceled_at}'.`,
+					message: `This appointment was already canceled on '${format(
+						appointment.canceled_at,
+						"MMMM do 'at' p"
+					)}'.`,
 				},
 			});
 		}
@@ -211,7 +214,19 @@ class AppointmentController {
 		await Mail.sendMail({
 			to: `${appointment.provider.name} <${appointment.provider.email}>`,
 			subject: 'Schedule canceled',
-			text: `The user '${appointment.client.name}' has canceled an appointment.`,
+			template: 'cancellation',
+			context: {
+				provider: appointment.provider.name,
+				client: appointment.client,
+				appointment: {
+					date: format(appointment.date, "MMMM do 'at' p"),
+					canceled_at: format(
+						appointment.canceled_at,
+						"MMMM do 'at' p"
+					),
+				},
+			},
+			// text: `The user '${appointment.client.name}' has canceled an appointment.`,
 		});
 
 		return res.json(appointment);

@@ -1,0 +1,33 @@
+<div class="container">
+	<div class="img-container">
+		<img src="http://localhost:3000/assets/images/gobarber-rs.png" alt="" />
+	</div>
+	<h4>Hi, {{ provider }}</h4>
+	<p>
+		An appointment cancellation has occurred.
+	</p>
+	<p>
+		See all the details below:
+	</p>
+	<div class="info">
+		<strong>Client: </strong>
+		<span>{{ client.name }} &lt;{{ client.email }}&gt;</span>
+	</div>
+
+	<div>
+		<strong>Appointment date: </strong>
+		<span>{{ appointment.date }}</span>
+	</div>
+
+	<div class="canceled">
+		<strong>Canceled at: </strong>
+		<span>{{ appointment.canceled_at }}</span>
+	</div>
+
+	<div class="date">
+		<small>
+			The time is again available for appointments.
+		</small>
+	</div>
+
+</div>
