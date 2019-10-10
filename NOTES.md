@@ -8,6 +8,10 @@
 
 `$ docker run --name mongobarber -p 27017:27017 -d -t mongo`
 
+#### Creating a Redis container
+
+`$ docker run --name redisbarber -p 6379:6379 -d -t redis:alpine`
+
 ## Eslint e Prettier
 
 #### Fixing all .js files in the src folder
