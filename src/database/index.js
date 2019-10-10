@@ -26,14 +26,11 @@ class Database {
 	mongo() {
 		// mongodb://localhost:27017/gobarber => O mongo n define usuário e
 		// senha por padrão então pode só colocar a url de acesso/nome da base
-		this.mongoConnection = mongoose.connect(
-			'mongodb://localhost:27017/gobarber',
-			{
-				useNewUrlParser: true,
-				useFindAndModify: true,
-				useUnifiedTopology: true,
-			}
-		);
+		this.mongoConnection = mongoose.connect(process.env.MONGO_URL, {
+			useNewUrlParser: true,
+			useFindAndModify: true,
+			useUnifiedTopology: true,
+		});
 	}
 }
 
